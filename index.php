@@ -85,7 +85,7 @@ function woocommerce_ipaymu_init() {
                 'apikey' => array(
                                 'title' => __( 'API Key', 'woothemes' ), 
                                 'type' => 'text', 
-                                'description' => __( ' Dapatkan API Key <a href=https://ipaymu.com/login/members/profile.htm target=_blank>di sini</a></small>.', 'woothemes' ), 
+                                'description' => __( ' Dapatkan API Key <a href=https://my.ipaymu.com/ target=_blank>di sini</a></small>.', 'woothemes' ),
                                 'default' => ''
                             ),
                 /*'debugrecip' => array(
@@ -120,20 +120,40 @@ function woocommerce_ipaymu_init() {
             
             $order = new WC_Order($order_id);
             
-            // URL Payment IPAYMU
-            $url = 'https://my.ipaymu.com/payment.htm';
+            // URL Payment IPAYMU Production
+            $url = 'https://my.ipaymu.com/payment';
+
+            // URL Payment IPAYMU Sandbox
+            // $url = 'https://sandbox.ipaymu.com/payment';
+
+            //for cod
+            foreach ($order->get_items() as $item_key => $item_value){
+                $width  = $item_value->get_product()->get_width();
+                $height = $item_value->get_product()->get_height();
+                $length = $item_value->get_product()->get_length();
+                $weight = $item_value->get_product()->get_weight();
+            }
+            $buyer_name = $order->get_billing_first_name() . $order->get_billing_last_name();
+            $buyer_email = $order->get_billing_email();
+            $buyer_phone = $order->get_billing_phone();
 
             // Prepare Parameters
             $params = array(
                         'key'      => $this->apikey, // API Key Merchant / Penjual
                         'action'   => 'payment',
-                        'product'  => 'Order : #'.$order_id,
+                        'product'  => 'Order : #' . $order_id,
                         'price'    => $order->order_total, // Total Harga
                         'quantity' => 1,
+                        'weight'   => $weight,
+                        'dimensi'  => $length . ":" . $width . ":" . $height,
+                        'reference_id' => $order_id,
                         'comments' => '', // Optional           
                         'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
                         'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                         'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
+                        'buyer_name' => $buyer_name,
+                        'buyer_phone' => $buyer_phone,
+                        'buyer_email' => $buyer_email,
                         'format'   => 'json' // Format: xml / json. Default: xml 
                     );
 
@@ -158,7 +178,7 @@ function woocommerce_ipaymu_init() {
                 $result = json_decode($request, true);
 
                 if( isset($result['url']) )
-                    header('location: '. $result['url']);
+                    wp_redirect($result['url']);
                 else {
                     echo "Request Error ". $result['Status'] .": ". $result['Keterangan'];
                 }
@@ -184,20 +204,29 @@ function woocommerce_ipaymu_init() {
 
   
         function check_ipaymu_response() {
-            
             global $woocommerce;
             $order = new WC_Order($_REQUEST['id_order']);
+            
+            $order_received_url = wc_get_endpoint_url( 'order-received', $_REQUEST['id_order'], wc_get_page_permalink( 'checkout' ) );
 
+            if ( 'yes' === get_option( 'woocommerce_force_ssl_checkout' ) || is_ssl() ) {
+                $order_received_url = str_replace( 'http:', 'https:', $order_received_url );
+            }
             if($_REQUEST['status'] == 'berhasil') {
             	$order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
             	$order->payment_complete();
+            } else if($_REQUEST['status'] == 'pending'){
+                $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
+                $order->update_status( 'on-hold' );
+                // $order->payment_complete();
             } else {
-            	$order->add_order_note( __( 'Menunggu pembayaran melalui non-member ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
+                $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
             }
 
-            $redirect = add_query_arg('key', $order->order_key, add_query_arg('order', $_REQUEST['id_order'], get_permalink(woocommerce_get_page_id('thanks'))));
+            // $order_received_url = add_query_arg('key', $order->order_key, add_query_arg('order', $_REQUEST['id_order'], $order_received_url));
+            $order_received_url = add_query_arg( 'key', $order->order_key, $order_received_url );
+            $redirect =  apply_filters( 'woocommerce_get_checkout_order_received_url', $order_received_url, $this );
             wp_redirect($redirect);
-            exit;
             
         }
 
