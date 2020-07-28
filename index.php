@@ -37,20 +37,21 @@ function woocommerce_ipaymu_init() {
             //Load settings
             $this->init_form_fields();
             $this->init_settings();
-            
+            // var_dump($this->settings);
+            // exit;
             // Define user set variables
-            $this->enabled      = $this->settings['enabled'];
+            $this->enabled      = $this->settings['enabled'] ?? '';
             $this->title        = "Ipaymu Payment";
-            $this->description  = $this->settings['description'];
+            $this->description  = $this->settings['description'] ?? '';
             $this->apikey       = $this->settings['apikey'];
-            $this->password     = $this->settings['password'];
-            $this->processor_id = $this->settings['processor_id'];
-            $this->salemethod   = $this->settings['salemethod'];
-            $this->gatewayurl   = $this->settings['gatewayurl'];
-            $this->order_prefix = $this->settings['order_prefix'];
-            $this->debugon      = $this->settings['debugon'];
-            $this->debugrecip   = $this->settings['debugrecip'];
-            $this->cvv          = $this->settings['cvv'];
+            $this->password     = $this->settings['password'] ?? '';
+            $this->processor_id = $this->settings['processor_id'] ?? '';
+            $this->salemethod   = $this->settings['salemethod'] ?? '';
+            $this->gatewayurl   = $this->settings['gatewayurl'] ?? '';
+            $this->order_prefix = $this->settings['order_prefix'] ?? '';
+            $this->debugon      = $this->settings['debugon'] ?? '';
+            $this->debugrecip   = $this->settings['debugrecip'] ?? '';
+            $this->cvv          = $this->settings['cvv'] ?? '';
             
             // Actions
             add_action('woocommerce_update_options_payment_gateways_' . $this->id, array(&$this, 'process_admin_options'));
