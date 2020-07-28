@@ -12,7 +12,8 @@
 if ( ! defined( 'ABSPATH' ) ) exit; 
 
 add_action('plugins_loaded', 'woocommerce_ipaymu_init', 0);
-
+// require_once('wp-includes/template-loader.php');
+// require('wp-blog-header.php');
 function woocommerce_ipaymu_init() {
 
     if (!class_exists('WC_Payment_Gateway'))
@@ -120,7 +121,9 @@ function woocommerce_ipaymu_init() {
             global $woocommerce;
             
             $order = new WC_Order($order_id);
-            
+            // var_dump($order);
+            // echo $order->get_total();
+            // exit;
             // URL Payment IPAYMU Production
             $url = 'https://my.ipaymu.com/payment';
 
@@ -143,7 +146,8 @@ function woocommerce_ipaymu_init() {
                         'key'      => $this->apikey, // API Key Merchant / Penjual
                         'action'   => 'payment',
                         'product'  => 'Order : #' . $order_id,
-                        'price'    => $order->order_total, // Total Harga
+                        // 'price'    => $order->order_total ?? $order->total, // Total Harga
+                        'price'    => $order->get_total(),
                         'quantity' => 1,
                         'weight'   => $weight,
                         'dimensi'  => $length . ":" . $width . ":" . $height,
