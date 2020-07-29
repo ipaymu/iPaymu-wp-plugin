@@ -229,7 +229,8 @@ function woocommerce_ipaymu_init() {
             }
 
             // $order_received_url = add_query_arg('key', $order->order_key, add_query_arg('order', $_REQUEST['id_order'], $order_received_url));
-            $order_received_url = add_query_arg( 'key', $order->order_key, $order_received_url );
+            // $order_received_url = add_query_arg( 'key', $order->order_key, $order_received_url );
+            $order_received_url = add_query_arg( 'key', $order->get_order_key(), $order_received_url );
             $redirect =  apply_filters( 'woocommerce_get_checkout_order_received_url', $order_received_url, $this );
             wp_redirect($redirect);
             
