@@ -131,37 +131,80 @@ function woocommerce_ipaymu_init() {
             // $url = 'https://sandbox.ipaymu.com/payment';
 
             //for cod
-            foreach ($order->get_items() as $item_key => $item_value){
-                $width  = $item_value->get_product()->get_width();
-                $height = $item_value->get_product()->get_height();
-                $length = $item_value->get_product()->get_length();
-                $weight = $item_value->get_product()->get_weight();
+            $width  = 0;
+            $height = 0;
+            $length = 0;
+            $weight = 0;
+
+            foreach ($order->get_items() as $item_key => $item_value) {
+
+                if($item_value->get_product()->get_width()) {
+                    $width = $width + $item_value->get_product()->get_width();
+                }
+                
+                if($item_value->get_product()->get_height()) {
+                    $height = $height + $item_value->get_product()->get_height();
+                }
+
+                if($item_value->get_product()->get_length()) {
+                    $length = $length + $item_value->get_product()->get_length();
+                }
+
+                if($item_value->get_product()->get_weight()) {
+                    $weight = $weight + $item_value->get_product()->get_weight();
+                }
+                // $width  = $item_value->get_product()->get_width();
+                
             }
+
             $buyer_name = $order->get_billing_first_name() . $order->get_billing_last_name();
             $buyer_email = $order->get_billing_email();
             $buyer_phone = $order->get_billing_phone();
 
-            // Prepare Parameters
-            $params = array(
-                        'key'      => $this->apikey, // API Key Merchant / Penjual
-                        'action'   => 'payment',
-                        'product'  => 'Order : #' . $order_id,
-                        // 'price'    => $order->order_total ?? $order->total, // Total Harga
-                        'price'    => $order->get_total(),
-                        'quantity' => 1,
-                        'weight'   => $weight,
-                        'dimensi'  => $length . ":" . $width . ":" . $height,
-                        'reference_id' => $order_id,
-                        'comments' => '', // Optional           
-                        'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
-                        'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
-                        'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
-                        'buyer_name' => $buyer_name,
-                        'buyer_phone' => $buyer_phone,
-                        'buyer_email' => $buyer_email,
-                        'format'   => 'json' // Format: xml / json. Default: xml 
-                    );
-
+           
+            if($weight > 0) {
+                 // Prepare Parameters
+                $params = array(
+                    'key'      => $this->apikey, // API Key Merchant / Penjual
+                    'action'   => 'payment',
+                    'product'  => 'Order : #' . $order_id,
+                    // 'price'    => $order->order_total ?? $order->total, // Total Harga
+                    'price'    => $order->get_total(),
+                    'quantity' => 1,
+                    'weight'   => $weight,
+                    'dimensi'  => $length . ":" . $width . ":" . $height,
+                    'reference_id' => $order_id,
+                    'comments' => '', // Optional           
+                    'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+                    'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
+                    'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
+                    'buyer_name' => $buyer_name,
+                    'buyer_phone' => $buyer_phone,
+                    'buyer_email' => $buyer_email,
+                    'format'   => 'json' // Format: xml / json. Default: xml 
+                );
+            } else {
+                 // Prepare Parameters
+                $params = array(
+                    'key'      => $this->apikey, // API Key Merchant / Penjual
+                    'action'   => 'payment',
+                    'product'  => 'Order : #' . $order_id,
+                    // 'price'    => $order->order_total ?? $order->total, // Total Harga
+                    'price'    => $order->get_total(),
+                    'quantity' => 1,
+                    // 'weight'   => $weight,
+                    // 'dimensi'  => $length . ":" . $width . ":" . $height,
+                    'reference_id' => $order_id,
+                    'comments' => '', // Optional           
+                    'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+                    'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
+                    'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
+                    'buyer_name' => $buyer_name,
+                    'buyer_phone' => $buyer_phone,
+                    'buyer_email' => $buyer_email,
+                    'format'   => 'json' // Format: xml / json. Default: xml 
+                );
+            }
             $params_string = http_build_query($params);
 
             //open connection
