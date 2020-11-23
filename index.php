@@ -131,30 +131,33 @@ function woocommerce_ipaymu_init() {
             // $url = 'https://sandbox.ipaymu.com/payment';
 
             //for cod
-            $width  = 0;
-            $height = 0;
-            $length = 0;
-            $weight = 0;
+            $width  = 1;
+            $height = 1;
+            $length = 1;
+            $weight = 1;
 
             foreach ($order->get_items() as $item_key => $item_value) {
 
-                if($item_value->get_product()->get_width() != false) {
-                    $width = $width + ($item_value->get_product()->get_width() ?? 0);
-                }
+                // if($item_value->get_product()->get_width() != false) {
+                //     $width = $item_value->get_product()->get_width() ?? 1;
+                // }
+                $width = $item_value->get_product()->get_width() ?? 1;
                 
-                if($item_value->get_product()->get_height() != false) {
-                    $height = $height + ($item_value->get_product()->get_height() ?? 0);
-                }
+                // if($item_value->get_product()->get_height() != false) {
+                //     $height = $item_value->get_product()->get_height() ?? 1;
+                // }
+                $height = $item_value->get_product()->get_height() ?? 1;
 
-                if($item_value->get_product()->get_length() != false) {
-                    $length = $length + ($item_value->get_product()->get_length() ?? 0);
-                }
+                // if($item_value->get_product()->get_length() != false) {
+                //     $length = $item_value->get_product()->get_length() ?? 1;
+                // }
+                $length = $item_value->get_product()->get_length() ?? 1;
 
-                if($item_value->get_product()->get_weight() != false) {
-                    $weight = $weight + ($item_value->get_product()->get_weight() ?? 0);
-                }
+                // if($item_value->get_product()->get_weight() != false) {
+                //     $weight = $item_value->get_product()->get_weight() ?? 1;
+                // }
+                $weight = $item_value->get_product()->get_weight() ?? 1;
                 // $width  = $item_value->get_product()->get_width();
-                
             }
 
             $buyer_name = $order->get_billing_first_name() . $order->get_billing_last_name();
