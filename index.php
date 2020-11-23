@@ -138,20 +138,20 @@ function woocommerce_ipaymu_init() {
 
             foreach ($order->get_items() as $item_key => $item_value) {
 
-                if($item_value->get_product()->get_width()) {
-                    $width = $width + $item_value->get_product()->get_width();
+                if($item_value->get_product()->get_width() != false) {
+                    $width = $width + ($item_value->get_product()->get_width() ?? 0);
                 }
                 
-                if($item_value->get_product()->get_height()) {
-                    $height = $height + $item_value->get_product()->get_height();
+                if($item_value->get_product()->get_height() != false) {
+                    $height = $height + ($item_value->get_product()->get_height() ?? 0);
                 }
 
-                if($item_value->get_product()->get_length()) {
-                    $length = $length + $item_value->get_product()->get_length();
+                if($item_value->get_product()->get_length() != false) {
+                    $length = $length + ($item_value->get_product()->get_length() ?? 0);
                 }
 
-                if($item_value->get_product()->get_weight()) {
-                    $weight = $weight + $item_value->get_product()->get_weight();
+                if($item_value->get_product()->get_weight() != false) {
+                    $weight = $weight + ($item_value->get_product()->get_weight() ?? 0);
                 }
                 // $width  = $item_value->get_product()->get_width();
                 
