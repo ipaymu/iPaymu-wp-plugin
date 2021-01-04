@@ -264,20 +264,26 @@ function woocommerce_ipaymu_init() {
                 $order_received_url = str_replace( 'http:', 'https:', $order_received_url );
             }
             if($_REQUEST['status'] == 'berhasil') {
-            	$order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
-            	$order->payment_complete();
-            } else if($_REQUEST['status'] == 'pending'){
+                $order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
+                $order->update_status( 'completed' );
+                $order->payment_complete();
+                echo 'completed';
+                exit;
+            } else if($_REQUEST['status'] == 'pending') {
                 $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
                 $order->update_status( 'on-hold' );
+                echo 'on-hold';
+                exit;
                 // $order->payment_complete();
             } else {
-                $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
+                $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu, id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
             }
 
             // $order_received_url = add_query_arg('key', $order->order_key, add_query_arg('order', $_REQUEST['id_order'], $order_received_url));
             // $order_received_url = add_query_arg( 'key', $order->order_key, $order_received_url );
             $order_received_url = add_query_arg( 'key', $order->get_order_key(), $order_received_url );
             $redirect =  apply_filters( 'woocommerce_get_checkout_order_received_url', $order_received_url, $this );
+            
             wp_redirect($redirect);
             
         }
