@@ -33,7 +33,8 @@ function woocommerce_ipaymu_init() {
             $this->icon = plugins_url('/ipaymu_badge.png', __FILE__);
             
             //redirect URL
-            $this->redirect_url = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_iPaymu', home_url( '/' ) ) );
+            // $this->redirect_url = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_Gateway_iPaymu', home_url( '/' ) ) );
+            $this->redirect_url = add_query_arg( 'wc-api', 'WC_Gateway_iPaymu', home_url( '/' ) );
             
             //Load settings
             $this->init_form_fields();
