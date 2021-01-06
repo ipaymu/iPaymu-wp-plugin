@@ -274,10 +274,11 @@ function woocommerce_ipaymu_init() {
                 $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $order->update_status( 'on-hold' );
+                    echo 'on-hold';
+                    exit;
                 }
                 
-                echo 'on-hold';
-                exit;
+                
                 // $order->payment_complete();
             } else {
                 $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu, id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
