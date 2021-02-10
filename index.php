@@ -43,6 +43,7 @@ function woocommerce_ipaymu_init() {
             // exit;
             // Define user set variables
             $this->enabled      = $this->settings['enabled'] ?? '';
+            $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'yes';
             $this->title        = "Ipaymu Payment";
             $this->description  = $this->settings['description'] ?? '';
             $this->apikey       = $this->settings['apikey'];
@@ -85,12 +86,20 @@ function woocommerce_ipaymu_init() {
                                 'description' => __( '', 'woothemes' ), 
                                 'default' => 'Sistem pembayaran menggunakan iPaymu.'
                             ),  
+                'sandbox_mode' => array(
+                                'title' => __( 'Mode Sandbox/Development', 'woothemes' ), 
+                                'label' => __( 'Aktifkan Mode Sandbox/Development', 'woothemes' ), 
+                                'type' => 'checkbox', 
+                                'description' => '<small>Mode Sandbox/Development digunakan untuk testing transaksi, untuk mengaktifkan mode sandbox Anda harus memasukan API Key Sandbox (<a href="https://sandbox.ipaymu.com/integration" target="_blank">dapatkan API Key Sandbox</a>)</small>', 
+                                'default' => 'no'
+                            ),
                 'apikey' => array(
                                 'title' => __( 'API Key', 'woothemes' ), 
                                 'type' => 'text', 
-                                'description' => __( ' Dapatkan API Key <a href=https://my.ipaymu.com/ target=_blank>di sini</a></small>.', 'woothemes' ),
+                                'description' => __( '<small>Dapatkan API Key Production <a href="https://my.ipaymu.com/integration" target="_blank">di sini</a>, atau API Key Sandbox <a href="https://sandbox.ipaymu.com/integration" target="_blank">di sini</a></small>.', 'woothemes' ),
                                 'default' => ''
                             ),
+              
                 /*'debugrecip' => array(
                                 'title' => __( 'Debugging Email', 'woothemes' ), 
                                 'type' => 'text', 
@@ -123,13 +132,13 @@ function woocommerce_ipaymu_init() {
             
             $order = new WC_Order($order_id);
             // var_dump($order);
-            // echo $order->get_total();
-            // exit;
-            // URL Payment IPAYMU Production
+            
+            
             $url = 'https://my.ipaymu.com/payment';
-
-            // URL Payment IPAYMU Sandbox
-            // $url = 'https://sandbox.ipaymu.com/payment';
+            if($this->sandbox_mode == 'yes') {
+                $url = 'https://sandbox.ipaymu.com/payment';    
+            }
+            
 
             //for cod
             $width  = 1;
