@@ -43,7 +43,7 @@ function woocommerce_ipaymu_init() {
             // exit;
             // Define user set variables
             $this->enabled      = $this->settings['enabled'] ?? '';
-            $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'yes';
+            $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'no';
             $this->title        = "Ipaymu Payment";
             $this->description  = $this->settings['description'] ?? '';
             $this->apikey       = $this->settings['apikey'];
