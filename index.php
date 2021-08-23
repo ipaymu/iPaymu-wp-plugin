@@ -90,7 +90,7 @@ function woocommerce_ipaymu_init() {
                                 'title' => __( 'Mode Sandbox/Development', 'woothemes' ), 
                                 'label' => __( 'Aktifkan Mode Sandbox/Development', 'woothemes' ), 
                                 'type' => 'checkbox', 
-                                'description' => '<small>Mode Sandbox/Development digunakan untuk testing transaksi, untuk mengaktifkan mode sandbox Anda harus memasukan API Key Sandbox (<a href="https://sandbox.ipaymu.com/integration" target="_blank">dapatkan API Key Sandbox</a>)</small>', 
+                                'description' => '<small>Mode Sandbox/Development digunakan untuk testing transaksi, jika mengaktifkan mode sandbox Anda harus memasukan API Key Sandbox (<a href="https://sandbox.ipaymu.com/integration" target="_blank">dapatkan API Key Sandbox</a>)</small>', 
                                 'default' => 'no'
                             ),
                 'apikey' => array(
