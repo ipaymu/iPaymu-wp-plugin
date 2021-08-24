@@ -191,9 +191,9 @@ function woocommerce_ipaymu_init() {
                     'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
                     'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                     'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
-                    'buyer_name' => $buyer_name,
-                    'buyer_phone' => $buyer_phone,
-                    'buyer_email' => $buyer_email,
+                    'buyer_name' => $buyer_name ?? '',
+                    'buyer_phone' => $buyer_phone ?? '',
+                    'buyer_email' => $buyer_email ?? '',
                     'format'   => 'json' // Format: xml / json. Default: xml 
                 );
             } else {
@@ -212,9 +212,9 @@ function woocommerce_ipaymu_init() {
                     'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
                     'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                     'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
-                    'buyer_name' => $buyer_name,
-                    'buyer_phone' => $buyer_phone,
-                    'buyer_email' => $buyer_email,
+                    'buyer_name' => $buyer_name ?? '',
+                    'buyer_phone' => $buyer_phone ?? '',
+                    'buyer_email' => $buyer_email ?? '',
                     'format'   => 'json' // Format: xml / json. Default: xml 
                 );
             }
@@ -241,7 +241,9 @@ function woocommerce_ipaymu_init() {
                 if( isset($result['url']) )
                     wp_redirect($result['url']);
                 else {
-                    echo "Request Error ". $result['Status'] .": ". $result['Keterangan'];
+                    //echo "Request Error ". $result['Status'] .": ". $result['Keterangan'];
+			
+		    echo "Request Error : " . json_encode($result);
                 }
             }
 
