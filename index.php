@@ -277,7 +277,8 @@ function woocommerce_ipaymu_init() {
             }
             if($_REQUEST['status'] == 'berhasil') {
                 $order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
-                $order->update_status( 'completed' );
+//                 $order->update_status( 'completed' );
+		$order->update_status( 'processing' );
                 $order->payment_complete();
                 echo 'completed';
                 exit;
