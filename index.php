@@ -276,12 +276,17 @@ function woocommerce_ipaymu_init() {
                 $order_received_url = str_replace( 'http:', 'https:', $order_received_url );
             }
             if($_REQUEST['status'] == 'berhasil') {
-                $order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
+
+		if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                	$order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
 //                 $order->update_status( 'completed' );
-		$order->update_status( 'processing' );
-                $order->payment_complete();
-                echo 'completed';
-                exit;
+			$order->update_status( 'processing' );
+	                $order->payment_complete();
+                	echo 'completed';
+        	        exit;
+		} else {
+			$order->add_order_note( __( 'ID transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
+		}
             } else if($_REQUEST['status'] == 'pending') {
                 $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
