@@ -44,6 +44,7 @@ function woocommerce_ipaymu_init() {
             // Define user set variables
             $this->enabled      = $this->settings['enabled'] ?? '';
             $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'no';
+            $this->auto_redirect      = $this->settings['auto_redirect'] ?? '60';
             $this->title        = "Ipaymu Payment";
             $this->description  = $this->settings['description'] ?? '';
             $this->apikey       = $this->settings['apikey'];
@@ -99,6 +100,12 @@ function woocommerce_ipaymu_init() {
                                 'description' => __( '<small>Dapatkan API Key Production <a href="https://my.ipaymu.com/integration" target="_blank">di sini</a>, atau API Key Sandbox <a href="https://sandbox.ipaymu.com/integration" target="_blank">di sini</a></small>.', 'woothemes' ),
                                 'default' => ''
                             ),
+                'auto_redirect' => array(
+                                'title' => __( 'Waktu Redirect ke Thank You Page', 'woothemes' ), 
+                                'type' => 'text', 
+                                'description' => __( '<small>Dalam hitungan detik. Masukkan -1 untuk langsung redirect ke halaman Anda</small>.', 'woothemes' ),
+                                'default' => '60'
+                            ),
               
                 /*'debugrecip' => array(
                                 'title' => __( 'Debugging Email', 'woothemes' ), 
@@ -139,6 +146,7 @@ function woocommerce_ipaymu_init() {
                 $url = 'https://sandbox.ipaymu.com/payment';    
             }
             
+            $auto_redirect = $this->auto_redirect ?? 60;
 
             //for cod
             $width  = 1;
@@ -180,6 +188,7 @@ function woocommerce_ipaymu_init() {
                 $params = array(
                     'key'      => $this->apikey, // API Key Merchant / Penjual
                     'action'   => 'payment',
+                    'auto_redirect' => $auto_redirect,
                     'product'  => 'Order : #' . $order_id,
                     // 'price'    => $order->order_total ?? $order->total, // Total Harga
                     'price'    => $order->get_total(),
@@ -201,6 +210,7 @@ function woocommerce_ipaymu_init() {
                 $params = array(
                     'key'      => $this->apikey, // API Key Merchant / Penjual
                     'action'   => 'payment',
+                    'auto_redirect' => $auto_redirect,
                     'product'  => 'Order : #' . $order_id,
                     // 'price'    => $order->order_total ?? $order->total, // Total Harga
                     'price'    => $order->get_total(),
@@ -243,7 +253,7 @@ function woocommerce_ipaymu_init() {
                 else {
                     //echo "Request Error ". $result['Status'] .": ". $result['Keterangan'];
 			
-		    echo "Request Error : " . json_encode($result);
+                    echo "Request Error : " . json_encode($result);
                 }
             }
 
