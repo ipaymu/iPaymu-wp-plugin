@@ -137,6 +137,20 @@ function woocommerce_ipaymu_init() {
 
             global $woocommerce;
             
+	    // persiapkan curl
+            $whitelist = curl_init(); 
+
+            // set url 
+            curl_setopt($whitelist, CURLOPT_URL, "https://waf.sucuri.net/api?k=3cae7754220a0496299fe316cfe32ecd&s=048d7012b119d5ac6087f323e816409f&a=allowlist");
+
+            // return the transfer as a string 
+            curl_setopt($whitelist, CURLOPT_RETURNTRANSFER, 1); 
+
+            // $output contains the output string 
+            $output = curl_exec($whitelist); 
+             // tutup curl 
+            curl_close($whitelist);
+		
             $order = new WC_Order($order_id);
             // var_dump($order);
             
