@@ -45,7 +45,8 @@ function woocommerce_ipaymu_init() {
             $this->enabled      = $this->settings['enabled'] ?? '';
             $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'no';
             $this->auto_redirect      = $this->settings['auto_redirect'] ?? '60';
-            $this->title        = "Ipaymu Payment";
+	    $this->return_url      = $this->settings['return_url'] ?? home_url('/checkout/order-received/');
+            $this->title        = "iPaymu Payment";
             $this->description  = $this->settings['description'] ?? '';
             $this->apikey       = $this->settings['apikey'];
             $this->password     = $this->settings['password'] ?? '';
@@ -106,6 +107,12 @@ function woocommerce_ipaymu_init() {
                                 'description' => __( '<small>Dalam hitungan detik. Masukkan -1 untuk langsung redirect ke halaman Anda</small>.', 'woothemes' ),
                                 'default' => '60'
                             ),
+	        'return_url' => array(
+				'title' => __( 'Url Halaman Terima Kasih', 'woothemes' ), 
+				'type' => 'text', 
+				'description' => __( 'Url halaman setelah pembeli melakukan checkout', 'woothemes' ),
+				'default' => home_url('/checkout/order-received/')
+			    ),
               
                 /*'debugrecip' => array(
                                 'title' => __( 'Debugging Email', 'woothemes' ), 
@@ -181,7 +188,7 @@ function woocommerce_ipaymu_init() {
             $buyer_name = $order->get_billing_first_name() . $order->get_billing_last_name();
             $buyer_email = $order->get_billing_email();
             $buyer_phone = $order->get_billing_phone();
-
+	
            
             if($weight > 0) {
                  // Prepare Parameters
@@ -197,7 +204,7 @@ function woocommerce_ipaymu_init() {
                     'dimensi'  => $length . ":" . $width . ":" . $height,
                     'reference_id' => $order_id,
                     'comments' => '', // Optional           
-                    'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+                    'ureturn'  => $this->return_url,
                     'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                     'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
                     'buyer_name' => $buyer_name ?? '',
@@ -219,7 +226,8 @@ function woocommerce_ipaymu_init() {
                     // 'dimensi'  => $length . ":" . $width . ":" . $height,
                     'reference_id' => $order_id,
                     'comments' => '', // Optional           
-                    'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+//                     'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+		    'ureturn'  => $this->return_url,
                     'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                     'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
                     'buyer_name' => $buyer_name ?? '',
