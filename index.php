@@ -49,9 +49,11 @@ function woocommerce_ipaymu_init() {
             $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'no';
             $this->auto_redirect   = $this->settings['auto_redirect'] ?? '60';
 	    $this->return_url      = $this->settings['return_url'] ?? $returnUrl;
+	    $this->expired_time    = $this->settings['expired_time'] ?? '24';
             $this->title        = "iPaymu Payment";
             $this->description  = $this->settings['description'] ?? '';
-            $this->apikey       = $this->settings['apikey'];
+            $this->apikey       = $this->settings['apikey'] ?? '';
+	    $this->ipaymu_va    = $this->settings['ipaymu_va'] ?? '';
             $this->password     = $this->settings['password'] ?? '';
             $this->processor_id = $this->settings['processor_id'] ?? '';
             $this->salemethod   = $this->settings['salemethod'] ?? '';
@@ -100,13 +102,19 @@ function woocommerce_ipaymu_init() {
                                 'default' => 'no'
                             ),
                 'apikey' => array(
-                                'title' => __( 'API Key', 'woothemes' ), 
+                                'title' => __( 'iPaymu API Key', 'woothemes' ), 
                                 'type' => 'text', 
                                 'description' => __( '<small>Dapatkan API Key Production <a href="https://my.ipaymu.com/integration" target="_blank">di sini</a>, atau API Key Sandbox <a href="https://sandbox.ipaymu.com/integration" target="_blank">di sini</a></small>.', 'woothemes' ),
                                 'default' => ''
                             ),
+		'ipaymu_va' => array(
+                                'title' => __( 'iPaymu VA', 'woothemes' ), 
+                                'type' => 'text', 
+                                'description' => __( '<small>Dapatkan VA Production <a href="https://my.ipaymu.com/integration" target="_blank">di sini</a>, atau API Key Sandbox <a href="https://sandbox.ipaymu.com/integration" target="_blank">di sini</a></small>.', 'woothemes' ),
+                                'default' => ''
+                            ),
                 'auto_redirect' => array(
-                                'title' => __( 'Waktu Redirect ke Thank You Page', 'woothemes' ), 
+                                'title' => __( 'Waktu redirect ke Thank You Page (time of redirect to Thank You Page in seconds)', 'woothemes' ), 
                                 'type' => 'text', 
                                 'description' => __( '<small>Dalam hitungan detik. Masukkan -1 untuk langsung redirect ke halaman Anda</small>.', 'woothemes' ),
                                 'default' => '60'
@@ -116,6 +124,12 @@ function woocommerce_ipaymu_init() {
                                 'type' => 'text', 
                                 'description' => __( '<small>Link halaman setelah pembeli melakukan checkout pesanan</small>.', 'woothemes' ),
                                 'default' => home_url('/checkout/order-received/')
+                            ),
+		'expired_time' => array(
+                                'title' => __( 'Expired kode pembayaran (expiry time of payment code)', 'woothemes' ), 
+                                'type' => 'text', 
+                                'description' => __( '<small>Dalam hitungan jam (in hours)</small>.', 'woothemes' ),
+                                'default' => '24'
                             ),
               
                 /*'debugrecip' => array(
@@ -198,6 +212,7 @@ function woocommerce_ipaymu_init() {
                  // Prepare Parameters
                 $params = array(
                     'key'      => $this->apikey, // API Key Merchant / Penjual
+		    'account'  => $this->ipaymu_va,
                     'action'   => 'payment',
                     'auto_redirect' => $auto_redirect,
                     'product'  => 'Order : #' . $order_id,
@@ -215,6 +230,8 @@ function woocommerce_ipaymu_init() {
                     'buyer_name' => $buyer_name ?? '',
                     'buyer_phone' => $buyer_phone ?? '',
                     'buyer_email' => $buyer_email ?? '',
+		    'expired' => $this->expied_time ?? 24,
+		    'expired_type' => 'hours',
                     'format'   => 'json' // Format: xml / json. Default: xml 
                 );
             } else {
@@ -238,6 +255,8 @@ function woocommerce_ipaymu_init() {
                     'buyer_name' => $buyer_name ?? '',
                     'buyer_phone' => $buyer_phone ?? '',
                     'buyer_email' => $buyer_email ?? '',
+  	 	    'expired' => $this->expied_time ?? 24,
+		    'expired_type' => 'hours',
                     'format'   => 'json' // Format: xml / json. Default: xml 
                 );
             }
