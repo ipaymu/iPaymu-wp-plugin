@@ -216,7 +216,7 @@ function woocommerce_ipaymu_init() {
                     'action'   => 'payment',
                     'auto_redirect' => $auto_redirect,
                     'product'  => 'Order : #' . $order_id,
-                    // 'price'    => $order->order_total ?? $order->total, // Total Harga
+//                     'price'    => $order->order_total ?? $order->total, // Total Harga
                     'price'    => $order->get_total(),
                     'quantity' => 1,
                     'weight'   => $weight,
@@ -319,32 +319,26 @@ function woocommerce_ipaymu_init() {
             }
 	    if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	    	 if($_REQUEST['status'] == 'berhasil') {
-
-			if ($_SERVER["REQUEST_METHOD"] == "POST") {
-				$order->add_order_note( __( 'Payment Success iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
-// 			  	$order->update_status( 'completed' );
-				$order->update_status( 'processing' );
-				$order->payment_complete();
-				echo 'completed';
-				exit;
-			} else {
-				$order->add_order_note( __( 'iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
-			}
-		    } else if($_REQUEST['status'] == 'pending') {
+			$order->add_order_note( __( 'Payment Success iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
+// 			$order->update_status( 'completed' );
+			$order->update_status( 'processing' );
+			$order->payment_complete();
+			echo 'completed';
+			exit;
+		 } else if($_REQUEST['status'] == 'pending') {
 			$order->add_order_note( __( 'Waiting Payment iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
-			if ($_SERVER["REQUEST_METHOD"] == "POST") {
-			    $order->update_status( 'on-hold' );
-			    echo 'on-hold';
-			    exit;
-			}
-		    } else if($_REQUEST['status'] == 'expired') {
+			$order->update_status( 'on-hold' );
+			echo 'on-hold';
+		    	exit;
+		 } else if($_REQUEST['status'] == 'expired') {
 			$order->add_order_note( __( 'Payment Expired iPaymu ID '.$_REQUEST['trx_id'] . ' expired', 'woocommerce' ) );
-			if ($_SERVER["REQUEST_METHOD"] == "POST") {
-			    $order->update_status( 'cancelled' );
-			    echo 'cancelled';
-			    exit;
-			}
-		    }
+			$order->update_status( 'cancelled' );
+			echo 'cancelled';
+			exit;
+		 } else {
+			echo 'invalid status';
+			exit;
+		 }
 	    }
            
 
