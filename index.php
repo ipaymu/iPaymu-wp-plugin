@@ -3,8 +3,8 @@
 /*
   Plugin Name: iPaymu Payment Gateway
   Plugin URI: http://ipaymu.com
-  Description: iPaymu Payment Gateway
-  Version: 1.1
+  Description: iPaymu - Indonesia Online Payment
+  Version: 2.0
   Author: iPaymu Development Team
   Author URI: http://ipaymu.com
  */
