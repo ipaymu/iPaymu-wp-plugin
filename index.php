@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: iPaymu Payment Gateway
+  Plugin Name: iPaymu - WooCommerce Payment Gateway
   Plugin URI: http://ipaymu.com
-  Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL
+  Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL. Directly Connected 150 Payment Channels Reach more than 95% of consumers which provides the payment methods they use every day
   Version: 2.0
   Author: iPaymu Development Team
   Author URI: http://ipaymu.com
