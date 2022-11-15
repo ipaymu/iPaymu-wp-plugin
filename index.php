@@ -317,31 +317,36 @@ function woocommerce_ipaymu_init() {
             if ( 'yes' === get_option( 'woocommerce_force_ssl_checkout' ) || is_ssl() ) {
                 $order_received_url = str_replace( 'http:', 'https:', $order_received_url );
             }
-            if($_REQUEST['status'] == 'berhasil') {
+	    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	    	 if($_REQUEST['status'] == 'berhasil') {
 
-		if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                	$order->add_order_note( __( 'Pembayaran telah dilakukan melalui ipaymu dengan id transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
-//                 $order->update_status( 'completed' );
-			$order->update_status( 'processing' );
-	                $order->payment_complete();
-                	echo 'completed';
-        	        exit;
-		} else {
-			$order->add_order_note( __( 'ID transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
-		}
-            } else if($_REQUEST['status'] == 'pending') {
-//                 $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan ID transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
-                if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//                     $order->update_status( 'on-hold' );
-                    echo 'on-hold';
-                    exit;
-                }
-                
-                
-                // $order->payment_complete();
-            } else {
-                $order->add_order_note( __( 'Menunggu pembayaran melalui iPaymu dengan ID transaksi '.$_REQUEST['trx_id'], 'woocommerce' ) );
-            }
+			if ($_SERVER["REQUEST_METHOD"] == "POST") {
+				$order->add_order_note( __( 'Payment Success iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
+// 			  	$order->update_status( 'completed' );
+				$order->update_status( 'processing' );
+				$order->payment_complete();
+				echo 'completed';
+				exit;
+			} else {
+				$order->add_order_note( __( 'iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
+			}
+		    } else if($_REQUEST['status'] == 'pending') {
+			$order->add_order_note( __( 'Waiting Payment iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
+			if ($_SERVER["REQUEST_METHOD"] == "POST") {
+			    $order->update_status( 'on-hold' );
+			    echo 'on-hold';
+			    exit;
+			}
+		    } else if($_REQUEST['status'] == 'expired') {
+			$order->add_order_note( __( 'Payment Expired iPaymu ID '.$_REQUEST['trx_id'] . ' expired', 'woocommerce' ) );
+			if ($_SERVER["REQUEST_METHOD"] == "POST") {
+			    $order->update_status( 'cancelled' );
+			    echo 'cancelled';
+			    exit;
+			}
+		    }
+	    }
+           
 
             // $order_received_url = add_query_arg('key', $order->order_key, add_query_arg('order', $_REQUEST['id_order'], $order_received_url));
             // $order_received_url = add_query_arg( 'key', $order->order_key, $order_received_url );
