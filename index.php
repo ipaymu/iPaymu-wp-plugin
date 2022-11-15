@@ -3,10 +3,13 @@
 /*
   Plugin Name: iPaymu Payment Gateway
   Plugin URI: http://ipaymu.com
-  Description: iPaymu - Indonesia Online Payment
+  Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL
   Version: 2.0
   Author: iPaymu Development Team
   Author URI: http://ipaymu.com
+  License: GPLv2 or later
+  WC requires at least: 2.0.0
+  WC tested up to: 6.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
