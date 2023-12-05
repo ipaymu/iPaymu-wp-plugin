@@ -428,6 +428,7 @@ function woocommerce_ipaymu_init() {
             $body['product'][0]     = 'Order #' . trim($order_id);
             $body['qty'][0]         = 1;
             $body['price'][0]       = $order->get_total();
+            
             $body['buyerName']           = trim($buyerName ?? null);
             $body['buyerPhone']          = trim($buyerPhone ?? null);
             $body['buyerEmail']          = trim($buyerEmail ?? null);
