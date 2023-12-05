@@ -45,18 +45,17 @@ function woocommerce_ipaymu_init() {
             //Load settings
             $this->init_form_fields();
             $this->init_settings();
-            // var_dump($this->settings);
-            // exit;
+            
             // Define user set variables
             $this->enabled      = $this->settings['enabled'] ?? '';
-            $this->sandbox_mode      = $this->settings['sandbox_mode'] ?? 'no';
+            $this->sandbox_mode    = $this->settings['sandbox_mode'] ?? 'no';
             $this->auto_redirect   = $this->settings['auto_redirect'] ?? '60';
-	    $this->return_url      = $this->settings['return_url'] ?? $returnUrl;
-	    $this->expired_time    = $this->settings['expired_time'] ?? '24';
+            $this->return_url      = $this->settings['return_url'] ?? $returnUrl;
+            $this->expired_time    = $this->settings['expired_time'] ?? '24';
             $this->title        = "iPaymu Payment";
             $this->description  = $this->settings['description'] ?? '';
             $this->apikey       = $this->settings['apikey'] ?? '';
-	    $this->ipaymu_va    = $this->settings['ipaymu_va'] ?? '';
+            $this->ipaymu_va    = $this->settings['ipaymu_va'] ?? '';
             $this->password     = $this->settings['password'] ?? '';
             $this->processor_id = $this->settings['processor_id'] ?? '';
             $this->salemethod   = $this->settings['salemethod'] ?? '';
@@ -110,7 +109,7 @@ function woocommerce_ipaymu_init() {
                                 'description' => __( '<small>Dapatkan API Key Production <a href="https://my.ipaymu.com/integration" target="_blank">di sini</a>, atau API Key Sandbox <a href="https://sandbox.ipaymu.com/integration" target="_blank">di sini</a></small>.', 'woothemes' ),
                                 'default' => ''
                             ),
-		'ipaymu_va' => array(
+                'ipaymu_va' => array(
                                 'title' => __( 'iPaymu VA', 'woothemes' ), 
                                 'type' => 'text', 
                                 'description' => __( '<small>Dapatkan VA Production <a href="https://my.ipaymu.com/integration" target="_blank">di sini</a>, atau API Key Sandbox <a href="https://sandbox.ipaymu.com/integration" target="_blank">di sini</a></small>.', 'woothemes' ),
@@ -122,19 +121,19 @@ function woocommerce_ipaymu_init() {
                                 'description' => __( '<small>Dalam hitungan detik. Masukkan -1 untuk langsung redirect ke halaman Anda</small>.', 'woothemes' ),
                                 'default' => '60'
                             ),
-		'return_url' => array(
-                                'title' => __( 'Url Thank You Page', 'woothemes' ), 
-                                'type' => 'text', 
-                                'description' => __( '<small>Link halaman setelah pembeli melakukan checkout pesanan</small>.', 'woothemes' ),
-                                'default' => home_url('/checkout/order-received/')
-                            ),
-		'expired_time' => array(
-                                'title' => __( 'Expired kode pembayaran (expiry time of payment code)', 'woothemes' ), 
-                                'type' => 'text', 
-                                'description' => __( '<small>Dalam hitungan jam (in hours)</small>.', 'woothemes' ),
-                                'default' => '24'
-                            ),
-              
+                'return_url' => array(
+                                        'title' => __( 'Url Thank You Page', 'woothemes' ), 
+                                        'type' => 'text', 
+                                        'description' => __( '<small>Link halaman setelah pembeli melakukan checkout pesanan</small>.', 'woothemes' ),
+                                        'default' => home_url('/checkout/order-received/')
+                                    ),
+                'expired_time' => array(
+                                        'title' => __( 'Expired kode pembayaran (expiry time of payment code)', 'woothemes' ), 
+                                        'type' => 'text', 
+                                        'description' => __( '<small>Dalam hitungan jam (in hours)</small>.', 'woothemes' ),
+                                        'default' => '24'
+                                    ),
+                    
                 /*'debugrecip' => array(
                                 'title' => __( 'Debugging Email', 'woothemes' ), 
                                 'type' => 'text', 
@@ -161,80 +160,100 @@ function woocommerce_ipaymu_init() {
         }
 
         
-        public function generate_ipaymu_form($order_id) {
+        public function generate_ipaymu_formV1($order_id) {
 
             global $woocommerce;
             
             $order = new WC_Order($order_id);
-            // var_dump($order);
             
             
             $url = 'https://my.ipaymu.com/payment';
-            if($this->sandbox_mode == 'yes') {
+            if ($this->sandbox_mode == 'yes') {
                 $url = 'https://sandbox.ipaymu.com/payment';    
             }
             
             $auto_redirect = $this->auto_redirect ?? 60;
-
             //for cod
-            $width  = 1;
-            $height = 1;
-            $length = 1;
-            $weight = 1;
+            $width  = array();
+            $height = array();
+            $length = array();
+            $weight = array();
 
-            foreach ($order->get_items() as $item_key => $item_value) {
+            $lengthTotal   = 0;
+            $widthTotal    = 0;
+            $heightTotal   = 0;
+            $weightTotal   = 0;
 
-                // if($item_value->get_product()->get_width() != false) {
-                //     $width = $item_value->get_product()->get_width() ?? 1;
-                // }
-                $width = $item_value->get_product()->get_width() ?? 1;
-                
-                // if($item_value->get_product()->get_height() != false) {
-                //     $height = $item_value->get_product()->get_height() ?? 1;
-                // }
-                $height = $item_value->get_product()->get_height() ?? 1;
+            foreach ($order->get_items() as $item_key => $item) {
+                $itemQty = $item->get_quantity();
+                if (!$itemQty) {
+                    continue;
+                }
 
-                // if($item_value->get_product()->get_length() != false) {
-                //     $length = $item_value->get_product()->get_length() ?? 1;
-                // }
-                $length = $item_value->get_product()->get_length() ?? 1;
+                $itemWeight = is_numeric($item->get_product()->get_weight() ) ? $item->get_product()->get_weight() : 0;
+                if ($itemWeight) {
+                    array_push( $weight, $itemWeight * $itemQty );
+                }
 
-                // if($item_value->get_product()->get_weight() != false) {
-                //     $weight = $item_value->get_product()->get_weight() ?? 1;
-                // }
-                $weight = $item_value->get_product()->get_weight() ?? 1;
-                // $width  = $item_value->get_product()->get_width();
+                $itemWidth = is_numeric($item->get_product()->get_width() ) ? $item->get_product()->get_width() : 0;
+                if ($itemWeight) {
+                    array_push( $width, $itemWidth);
+                }
+
+                $itemHeight = is_numeric($item->get_product()->get_height() ) ? $item->get_product()->get_height() : 0;
+                if ($itemHeight) {
+                    array_push( $height, $itemWidth);
+                }
+
+                $itemLength = is_numeric($item->get_product()->get_length() ) ? $item->get_product()->get_length() : 0;
+                if ($itemLength) {
+                    array_push( $length, $itemLength);
+                }
             }
 
             $buyer_name = $order->get_billing_first_name() . $order->get_billing_last_name();
             $buyer_email = $order->get_billing_email();
             $buyer_phone = $order->get_billing_phone();
 
+            if ($weight) {
+                $weightTotal = wc_get_weight(array_sum($weight), 'kg');
+            }
+
+            if ($width) {
+                $widthTotal = wc_get_dimension(max($width), 'cm');
+            }
+    
+            if ($length) {
+                $lengthTotal = wc_get_dimension(max($length), 'cm' );
+            }
+    
+            if ($height) {
+                $heightTotal = wc_get_dimension(array_sum($height), 'cm' );
+            }
            
-            if($weight > 0) {
+            if ($weightTotal > 0) {
                  // Prepare Parameters
                 $params = array(
                     'key'      => $this->apikey, // API Key Merchant / Penjual
-		    'account'  => $this->ipaymu_va,
+                    'account'  => $this->ipaymu_va,
                     'action'   => 'payment',
                     'auto_redirect' => $auto_redirect,
                     'product'  => 'Order : #' . $order_id,
-//                     'price'    => $order->order_total ?? $order->total, // Total Harga
                     'price'    => $order->get_total(),
                     'quantity' => 1,
-                    'weight'   => $weight,
-                    'dimensi'  => $length . ":" . $width . ":" . $height,
+                    'weight'   => $weightTotal,
+                    'dimensi'  => $lengthTotal . ":" . $widthTotal . ":" . $heightTotal,
                     'reference_id' => $order_id,
                     'comments' => '', // Optional           
-//                     'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
-		    'ureturn'  => $this->return_url,
+                    // 'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+                    'ureturn'  => $this->return_url,
                     'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                     'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
                     'buyer_name' => $buyer_name ?? '',
                     'buyer_phone' => $buyer_phone ?? '',
                     'buyer_email' => $buyer_email ?? '',
-		    'expired' => $this->expied_time ?? 24,
-		    'expired_type' => 'hours',
+                    'expired' => $this->expied_time ?? 24,
+                    'expired_type' => 'hours',
                     'format'   => 'json' // Format: xml / json. Default: xml 
                 );
             } else {
@@ -251,15 +270,15 @@ function woocommerce_ipaymu_init() {
                     // 'dimensi'  => $length . ":" . $width . ":" . $height,
                     'reference_id' => $order_id,
                     'comments' => '', // Optional           
-//                     'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
-		    'ureturn'  => $this->return_url,
+                    // 'ureturn'  => $this->redirect_url.'&id_order='.$order_id,
+                    'ureturn'  => $this->return_url,
                     'unotify'  => $this->redirect_url.'&id_order='.$order_id.'&param=notify',
                     'ucancel'  => $this->redirect_url.'&id_order='.$order_id.'&param=cancel',
                     'buyer_name' => $buyer_name ?? '',
                     'buyer_phone' => $buyer_phone ?? '',
                     'buyer_email' => $buyer_email ?? '',
-  	 	    'expired' => $this->expied_time ?? 24,
-		    'expired_type' => 'hours',
+                    'expired' => $this->expied_time ?? 24,
+                    'expired_type' => 'hours',
                     'format'   => 'json' // Format: xml / json. Default: xml 
                 );
             }
@@ -283,7 +302,7 @@ function woocommerce_ipaymu_init() {
                 
                 $result = json_decode($request, true);
 
-                if( isset($result['url']) )
+                if ( isset($result['url']) )
                     wp_redirect($result['url']);
                 else {
                     //echo "Request Error ". $result['Status'] .": ". $result['Keterangan'];
@@ -294,6 +313,146 @@ function woocommerce_ipaymu_init() {
 
             //close connection
             curl_close($ch);
+
+        }
+
+        function generate_ipaymu_form($order_id) {
+            global $woocommerce;
+            
+            $order = new WC_Order($order_id);
+            
+            
+            $url = 'https://my.ipaymu.com/api/v2/payment';
+            if ($this->sandbox_mode == 'yes') {
+                $url = 'https://sandbox.ipaymu.com/api/v2/payment';    
+            }
+
+            $buyerName = $order->get_billing_first_name() . $order->get_billing_last_name();
+            $buyerEmail = $order->get_billing_email();
+            $buyerPhone = $order->get_billing_phone();
+
+            $body['product'] = [];
+            $body['qty']     = [];
+            $body['price']   = [];
+
+            $width  = array();
+            $height = array();
+            $length = array();
+            $weight = array();
+
+            $totalPrice = 0;
+            $i = 0;
+
+            foreach ($order->get_items() as $kitem => $item) {
+                $itemQty = $item->get_quantity();
+                if (!$itemQty) {
+                    continue;
+                }
+
+                $product        = $item->get_product();
+               
+                $width  = 0;
+                $height = 0;
+                $length = 0;
+                $weight = 0;
+
+                $itemWeight = is_numeric($item->get_product()->get_weight() ) ? $item->get_product()->get_weight() : 0;
+                if ($itemWeight) {
+                    $weight = wc_get_weight($itemWeight * $itemQty, 'kg');
+                }
+
+                $itemWidth = is_numeric($item->get_product()->get_width() ) ? $item->get_product()->get_width() : 0;
+                if ($itemWidth) {
+                    $width = wc_get_dimension($itemWidth, 'cm');
+                }
+
+                $itemHeight = is_numeric($item->get_product()->get_height() ) ? $item->get_product()->get_height() : 0;
+                if ($itemHeight) {
+                    $height = wc_get_dimension($itemHeight, 'cm');
+                }
+
+                $itemLength = is_numeric($item->get_product()->get_length() ) ? $item->get_product()->get_length() : 0;
+                if ($itemLength) {
+                    $length = wc_get_dimension($itemLength, 'cm');
+                }
+                
+                $body['product'][$i]     = trim($item->get_name());
+                $body['qty'][$i]         = trim($item->get_quantity());
+                $body['price'][$i]       = trim($product->get_price());
+                $body['weight'][$i]      = trim(ceil($weight));
+                $body['length'][$i]      = trim(ceil($length));
+                $body['width'][$i]       = trim(ceil($width));
+                $body['height'][$i]      = trim(ceil($height));
+                $body['dimension'][$i]   = trim(ceil($length)) . ':' . trim(ceil($width)) . ':' . trim(ceil($height));
+
+                $totalPrice += floatval($product->get_price()) * intval($item->get_quantity());
+                $i++;
+            }
+
+            if ($totalPrice != $order->get_total()) {
+                echo 'Invalid Total Product Price';
+                exit;
+                // return new WP_Error( 'ipaymu_request', 'Invalid Total Product Price');
+            }
+    
+            $body['buyerName']           = trim($buyerName ?? null);
+            $body['buyerPhone']          = trim($buyerPhone ?? null);
+            $body['buyerEmail']          = trim($buyerEmail ?? null);
+            $body['referenceId']         = trim($order_id);
+            $body['returnUrl']           = trim($this->return_url);
+            $body['notifyUrl']           = trim($this->redirect_url.'&id_order='.$order_id.'&param=notify');
+            $body['cancelUrl']           = trim($this->redirect_url.'&id_order='.$order_id.'&param=cancel');
+            $body['expired']             = trim($this->expied_time ?? 24);
+            $body['expiredType']         = 'hours';
+
+
+            $bodyJson     = json_encode($body, JSON_UNESCAPED_SLASHES);
+            $requestBody  = strtolower(hash('sha256', $bodyJson));
+            $secret       = $this->apikey;
+            $va           = $this->ipaymu_va;
+            $stringToSign = 'POST:' . $va . ':' . $requestBody . ':' . $secret;
+            $signature    = hash_hmac('sha256', $stringToSign, $secret);
+
+            $headers = array(
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'va: ' . $va,
+                'signature: ' . $signature,
+            );
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $bodyJson);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $err = curl_error($ch);
+            $res = curl_exec($ch);
+            // $health = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if (!empty($err)) {
+                echo 'Invalid request: ' . $err;
+                exit;
+                // return new WP_Error( 'ipaymu_request', 'Invalid request: ' . $err);
+            }
+            if (empty($res)) {
+                // return new WP_Error( 'ipaymu_request', 'Invalid request');
+                echo 'Request Failed: Invalid response';
+                exit;
+            }
+
+            $response = json_decode($res);
+            if (!empty($response->Data->Url)) {
+                wp_redirect($response->Data->Url);
+            } else {
+                echo 'Invalid request: ' . $response->Message;
+                exit;
+                // return new WP_Error( 'ipaymu_request', 'Invalid request: ' . $response->Message);
+            }
         }
 
         
@@ -320,29 +479,29 @@ function woocommerce_ipaymu_init() {
             if ( 'yes' === get_option( 'woocommerce_force_ssl_checkout' ) || is_ssl() ) {
                 $order_received_url = str_replace( 'http:', 'https:', $order_received_url );
             }
-	    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-	    	 if($_REQUEST['status'] == 'berhasil') {
-			$order->add_order_note( __( 'Payment Success iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
-// 			$order->update_status( 'completed' );
-			$order->update_status( 'processing' );
-			$order->payment_complete();
-			echo 'completed';
-			exit;
-		 } else if($_REQUEST['status'] == 'pending') {
-			$order->add_order_note( __( 'Waiting Payment iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
-			$order->update_status( 'on-hold' );
-			echo 'on-hold';
-		    	exit;
-		 } else if($_REQUEST['status'] == 'expired') {
-			$order->add_order_note( __( 'Payment Expired iPaymu ID '.$_REQUEST['trx_id'] . ' expired', 'woocommerce' ) );
-			$order->update_status( 'cancelled' );
-			echo 'cancelled';
-			exit;
-		 } else {
-			echo 'invalid status';
-			exit;
-		 }
-	    }
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                if ($_REQUEST['status'] == 'berhasil') {
+                    $order->add_order_note( __( 'Payment Success iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
+                    $order->update_status( 'completed' );
+                    $order->update_status( 'processing' );
+                    $order->payment_complete();
+                echo 'completed';
+                exit;
+                } else if($_REQUEST['status'] == 'pending') {
+                    $order->add_order_note( __( 'Waiting Payment iPaymu ID '.$_REQUEST['trx_id'], 'woocommerce' ) );
+                    $order->update_status( 'on-hold' );
+                    echo 'on-hold';
+                        exit;
+                } else if($_REQUEST['status'] == 'expired') {
+                    $order->add_order_note( __( 'Payment Expired iPaymu ID '.$_REQUEST['trx_id'] . ' expired', 'woocommerce' ) );
+                    $order->update_status( 'cancelled' );
+                    echo 'cancelled';
+                    exit;
+                } else {
+                    echo 'invalid status';
+                    exit;
+                }
+            }
            
 
             // $order_received_url = add_query_arg('key', $order->order_key, add_query_arg('order', $_REQUEST['id_order'], $order_received_url));
