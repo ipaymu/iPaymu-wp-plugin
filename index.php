@@ -340,8 +340,8 @@ function woocommerce_ipaymu_init() {
             $length = array();
             $weight = array();
 
-            $totalPrice = 0;
-            $i = 0;
+            // $totalPrice = 0;
+            // $i = 0;
 
             foreach ($order->get_items() as $kitem => $item) {
                 $itemQty = $item->get_quantity();
@@ -349,52 +349,85 @@ function woocommerce_ipaymu_init() {
                     continue;
                 }
 
-                $product        = $item->get_product();
-               
-                $width  = 0;
-                $height = 0;
-                $length = 0;
-                $weight = 0;
+                // $product        = $item->get_product();
+                // $weightVal = 0;
+                // $lengthVal = 0;
+                // $widthVal  = 0;
+                // $heightVal = 0;
 
                 $itemWeight = is_numeric($item->get_product()->get_weight() ) ? $item->get_product()->get_weight() : 0;
                 if ($itemWeight) {
-                    $weight = wc_get_weight($itemWeight * $itemQty, 'kg');
+                    // $weightVal = wc_get_weight($itemWeight * $itemQty, 'kg');
+                    array_push( $weight, $itemWeight * $itemQty );
                 }
 
                 $itemWidth = is_numeric($item->get_product()->get_width() ) ? $item->get_product()->get_width() : 0;
                 if ($itemWidth) {
-                    $width = wc_get_dimension($itemWidth, 'cm');
+                    // $widthVal = wc_get_dimension($itemWidth, 'cm');
+                    array_push( $width, $itemWidth );
                 }
 
                 $itemHeight = is_numeric($item->get_product()->get_height() ) ? $item->get_product()->get_height() : 0;
                 if ($itemHeight) {
-                    $height = wc_get_dimension($itemHeight, 'cm');
+                    // $heightVal = wc_get_dimension($itemHeight, 'cm');
+                    array_push( $height, $itemHeight );
                 }
 
                 $itemLength = is_numeric($item->get_product()->get_length() ) ? $item->get_product()->get_length() : 0;
                 if ($itemLength) {
-                    $length = wc_get_dimension($itemLength, 'cm');
+                    // $lengthVal = wc_get_dimension($itemLength, 'cm');
+                    array_push( $length, $itemLength );
                 }
                 
-                $body['product'][$i]     = trim($item->get_name());
-                $body['qty'][$i]         = trim($item->get_quantity());
-                $body['price'][$i]       = trim($product->get_price());
-                $body['weight'][$i]      = trim(ceil($weight));
-                $body['length'][$i]      = trim(ceil($length));
-                $body['width'][$i]       = trim(ceil($width));
-                $body['height'][$i]      = trim(ceil($height));
-                $body['dimension'][$i]   = trim(ceil($length)) . ':' . trim(ceil($width)) . ':' . trim(ceil($height));
+                // $body['product'][$i]     = trim($item->get_name());
+                // $body['qty'][$i]         = trim($item->get_quantity());
+                // $body['price'][$i]       = trim($product->get_price());
+                // $body['weight'][$i]      = trim(ceil($weightVal));
+                // $body['length'][$i]      = trim(ceil($lengthVal));
+                // $body['width'][$i]       = trim(ceil($widthVal));
+                // $body['height'][$i]      = trim(ceil($heightVal));
+                // $body['dimension'][$i]   = ceil($lengthVal) . ':' . ceil($widthVal) . ':' . ceil($heightVal);
 
-                $totalPrice += floatval($product->get_price()) * intval($item->get_quantity());
-                $i++;
+                // $totalPrice += floatval($product->get_price()) * intval($item->get_quantity());
+                // $i++;
             }
 
-            if ($totalPrice != $order->get_total()) {
-                echo 'Invalid Total Product Price';
-                exit;
-                // return new WP_Error( 'ipaymu_request', 'Invalid Total Product Price');
+
+            // if ($totalPrice != $order->get_total()) {
+                
+            // }
+            
+            
+            $weightVal = 0;
+            $lengthVal = 0;
+            $widthVal  = 0;
+            $heightVal = 0;
+            if (!empty($weight)) {
+                $weightVal      = ceil(wc_get_weight(array_sum( $weight ), 'kg'));
             }
+
+            if (!empty($length)) {
+                $lengthVal      = ceil(wc_get_dimension( max( $length ), 'cm' ));
+            }
+
+            if (!empty($width)) {
+                $widthVal      = ceil(wc_get_dimension( max( $width ), 'cm' ));
+            }
+
+            if (!empty($height)) {
+                $heightVal      = ceil(wc_get_dimension( max( $height ), 'cm' ));
+            }
+            
+            
+            $body['weight'][0]      = $weightVal;
+            $body['length'][0]      = $lengthVal;
+            $body['width'][0]       = $widthVal;
+            $body['height'][0]      = $heightVal;
+            $body['dimension'][0]   = $lengthVal . ':' . $widthVal . ':' . $heightVal;
     
+            $body['product'][0]     = 'Order #' . trim($order_id);
+            $body['qty'][0]         = 1;
+            $body['price'][0]       = $order->get_total();
             $body['buyerName']           = trim($buyerName ?? null);
             $body['buyerPhone']          = trim($buyerPhone ?? null);
             $body['buyerEmail']          = trim($buyerEmail ?? null);
