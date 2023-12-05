@@ -327,7 +327,7 @@ function woocommerce_ipaymu_init() {
                 $url = 'https://sandbox.ipaymu.com/api/v2/payment';    
             }
 
-            $buyerName = $order->get_billing_first_name() . $order->get_billing_last_name();
+            $buyerName  = $order->get_billing_first_name() . $order->get_billing_last_name();
             $buyerEmail = $order->get_billing_email();
             $buyerPhone = $order->get_billing_phone();
 
@@ -446,13 +446,12 @@ function woocommerce_ipaymu_init() {
             }
 
             $response = json_decode($res);
-            if (!empty($response->Data->Url)) {
-                wp_redirect($response->Data->Url);
-            } else {
+            if (empty($response->Data->Url)) {
                 echo 'Invalid request: ' . $response->Message;
                 exit;
-                // return new WP_Error( 'ipaymu_request', 'Invalid request: ' . $response->Message);
+                
             }
+            wp_redirect($response->Data->Url);
         }
 
         
