@@ -12,19 +12,6 @@
   WC tested up to: 8.6.0
 */
 
-declare(strict_types=1);
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
-
-add_action('before_woocommerce_init', function () {
-    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, false);
-    }
-});
-
 /*
  * This action hook registers our PHP class as a WooCommerce payment gateway
  */

@@ -1,18 +1,31 @@
 <?php
 
 /*
-Plugin Name: iPaymu - WooCommerce Payment Gateway
-Plugin URI: http://ipaymu.com
-Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL. Directly Connected 150 Payment Channels Reach more than 95% of consumers which provides the payment methods they use every day
-Version: 2.0
-Author: iPaymu Development Team
-Author URI: http://ipaymu.com
-License: GPLv2 or later
-WC requires at least: 2.0.0
-WC tested up to: 6.1
+  Plugin Name: iPaymu - WooCommerce Payment Gateway
+  Plugin URI: http://ipaymu.com
+  Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL. Directly Connected 150 Payment Channels Reach more than 95% of consumers which provides the payment methods they use every day
+  Version: 2.0
+  Author: iPaymu Development Team
+  Author URI: http://ipaymu.com
+  License: MIT
+  WC requires at least: 8.0.0
+  WC tested up to: 8.6.0
 */
 
-// Your plugin code goes here
+
+declare(strict_types=1);
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
+
+add_action('before_woocommerce_init', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+    }
+});
+
 
 add_action('plugins_loaded', 'woocommerce_myplugin', 0);
 function woocommerce_myplugin(){
@@ -68,4 +81,3 @@ function oawoo_register_order_approval_payment_method_type() {
         }
     );
 }
-?>
