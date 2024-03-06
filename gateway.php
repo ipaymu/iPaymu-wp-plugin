@@ -12,17 +12,13 @@
   WC tested up to: 8.6.0
 */
 
-/*
- * This action hook registers our PHP class as a WooCommerce payment gateway
- */
-add_filter('woocommerce_payment_gateways', 'ipaymu_add_gateway_class');
 
 function ipaymu_add_gateway_class($gateways)
 {
     $gateways[] = 'WC_Ipaymu_Gateway'; // your class name is here
     return $gateways;
 }
-class Ipaymu extends WC_Payment_Gateway
+class Ipaymu extends \WC_Payment_Gateway
 {
     public $id;
     public $method_title;
