@@ -16,7 +16,7 @@ This is the official WooCommerce extension to receive payments using iPaymu Indo
 
 The iPaymu Payment Gateway extension for WooCommerce enables you to accept payments including Subscriptions, Deposits & Pre-Orders via one of Indonesia most popular payment gateways.
 
-### Instalation
+### Installation
 
 1. [Download](../../archive/master.zip) the plugin from this repository.
 2. Extract the plugin.
