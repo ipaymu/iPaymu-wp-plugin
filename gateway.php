@@ -1,38 +1,20 @@
 <?php
-
-/*
-  Plugin Name: iPaymu - WooCommerce Payment Gateway
-  Plugin URI: http://ipaymu.com
-  Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL. Directly Connected 150 Payment Channels Reach more than 95% of consumers which provides the payment methods they use every day
-  Version: 2.0
-  Author: iPaymu Development Team
-  Author URI: http://ipaymu.com
-  License: MIT
-  WC requires at least: 8.0.0
-  WC tested up to: 8.6.0
-*/
-
-
-function ipaymu_add_gateway_class($gateways)
-{
-    $gateways[] = 'WC_Ipaymu_Gateway'; // your class name is here
-    return $gateways;
-}
-class Ipaymu extends \WC_Payment_Gateway
+class WC_Gateway_iPaymu extends \WC_Payment_Gateway
 {
     public $id;
     public $method_title;
     public $method_description;
-    public $has_fields;
     public $icon;
+    public $has_fields;
     public $redirect_url;
     public $auto_redirect;
     public $return_url;
     public $expired_time;
+    public $title;
+    public $description;
     public $url;
     public $va;
     public $secret;
-    public $settings;
 
 
     // Constructor method
@@ -40,9 +22,10 @@ class Ipaymu extends \WC_Payment_Gateway
     {
 
         $this->id                 = 'ipaymu';
+        
         //Payment Gateway title
-        $this->method_title       = 'iPaymu Payment Gateway';
-        $this->method_description = 'Payment Gateway Terlengkap & Terbaik';
+        $this->method_title       = 'iPaymu Payment';
+        $this->method_description = 'Pembayaran Virtual Account, QRIS, Alfamart/Indomaret, Direct Debit, Kartu Kredit, dan COD.';
         
         //true only in case of direct payment method, false in our case
         $this->has_fields         = false;
@@ -52,41 +35,30 @@ class Ipaymu extends \WC_Payment_Gateway
         //redirect URL
         $returnUrl                = home_url('/checkout/order-received/');
 
-        $this->redirect_url      = add_query_arg('wc-api', 'WC_Gateway_iPaymu', home_url('/'));
+        $this->redirect_url       = add_query_arg('wc-api', 'WC_Gateway_iPaymu', home_url('/'));
 
-        //thank you page URL
 
         //Load settings
         $this->init_form_fields();
         $this->init_settings();
 
         // Define user set variables
-        $this->enabled         = $this->settings['enabled'] ?? 'no';
-        $this->auto_redirect   = $this->settings['auto_redirect'] ?? 120;
-        $this->return_url      = $this->settings['return_url'] ?? $returnUrl;
-        $this->expired_time    = $this->settings['expired_time'] ?? 24;
-        $this->title           = "iPaymu Payment";
-        $this->description     = $this->settings['description'] ?? '';
+        $this->enabled         = $this->get_option( 'enabled' );
+        $this->auto_redirect   = $this->get_option('auto_redirect');
+        $this->return_url      = $this->get_option('return_url') ?? $returnUrl;
+        $this->expired_time    = $this->get_option('expired_time') ?? 24;
+        $this->title           = $this->get_option( 'title' );
+        $this->description     = $this->get_option('description') ??  'Pembayaran Virtual Account, QRIS, Alfamart/Indomaret, Direct Debit, Kartu Kredit, dan COD.';
 
-        if ($this->settings['testmode'] == 'yes') {
+        if ($this->get_option( 'testmode' ) == 'yes') {
             $this->url = 'https://sandbox.ipaymu.com/api/v2/payment';
-            $this->va     = $this->settings['sandbox_va'];
-            $this->secret = $this->settings['sandbox_key'];
+            $this->va     = $this->get_option('sandbox_va');
+            $this->secret = $this->get_option('sandbox_key');
         } else {
             $this->url    = 'https://my.ipaymu.com/api/v2/payment';
-            $this->va     = $this->settings['production_va'];
-            $this->secret = $this->settings['production_key'];
+            $this->va     = $this->get_option('production_va');
+            $this->secret = $this->get_option('production_key');
         }
-
-        // $this->password     = $this->settings['password'] ?? '';
-        // $this->processor_id = $this->settings['processor_id'] ?? '';
-        // $this->salemethod   = $this->settings['salemethod'] ?? '';
-        // $this->gatewayurl   = $this->settings['gatewayurl'] ?? '';
-        // $this->order_prefix = $this->settings['order_prefix'] ?? '';
-        // $this->debugon      = $this->settings['debugon'] ?? '';
-        // $this->debugrecip   = $this->settings['debugrecip'] ?? '';
-        // $this->cvv          = $this->settings['cvv'] ?? '';
-
 
         // Actions
         add_action('woocommerce_receipt_ipaymu', array(&$this, 'receipt_page'));
@@ -94,9 +66,6 @@ class Ipaymu extends \WC_Payment_Gateway
         // Payment listener/API hook
         add_action('woocommerce_api_wc_gateway_ipaymu', array($this, 'check_ipaymu_response'));
 
-        // Other initialization code goes here
-        $this->init_form_fields();
-        $this->init_settings();
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     }
@@ -115,14 +84,15 @@ class Ipaymu extends \WC_Payment_Gateway
             'title' => array(
                 'title' => __('Title', 'woothemes'),
                 'type'        => 'text',
-                'description' => 'This controls the title which the user sees during checkout.',
-                'default'     => 'iPaymu Payment',
+                'description' => 'Nama Metode Pembayaran',
+                'default'     => 'Pembayaran iPaymu',
+                'desc_tip'    => true,
             ),
             'description' => array(
                 'title' => __('Description', 'woothemes'),
                 'type'        => 'textarea',
-                'description' => '',
-                'default'     => 'Pay with your credit card via our super-cool payment gateway.',
+                'description' => 'Deskripsi Metode Pembayaran',
+                'default'     => 'Pembayaran melalui Virtual Account, QRIS, Alfamart / Indomaret, Direct Debit, Kartu Kredit, COD, dan lainnya ',
             ),
             'testmode' => array(
                 'title'   => __('Mode Test/Sandbox', 'woothemes'),
@@ -179,7 +149,7 @@ class Ipaymu extends \WC_Payment_Gateway
     function process_payment($order_id)
     {
 
-        $order = new WC_Order($order_id);
+        $order = new \WC_Order($order_id);
 
         $buyerName  = $order->get_billing_first_name() . $order->get_billing_last_name();
         $buyerEmail = $order->get_billing_email();
@@ -372,4 +342,164 @@ class Ipaymu extends \WC_Payment_Gateway
 
         wp_redirect($redirect);
     }
+
+    function receipt_page($order) {
+        echo $this->generate_ipaymu_form($order);
+    }
+
+    function generate_ipaymu_form($order_id) {
+        global $woocommerce;
+        
+        $order = new WC_Order($order_id);
+        
+        
+        $url = 'https://my.ipaymu.com/api/v2/payment';
+        if ($this->sandbox_mode == 'yes') {
+            $url = 'https://sandbox.ipaymu.com/api/v2/payment';    
+        }
+
+        $buyerName  = $order->get_billing_first_name() . $order->get_billing_last_name();
+        $buyerEmail = $order->get_billing_email();
+        $buyerPhone = $order->get_billing_phone();
+
+        $body['product'] = [];
+        $body['qty']     = [];
+        $body['price']   = [];
+
+        $width  = array();
+        $height = array();
+        $length = array();
+        $weight = array();
+
+        // $totalPrice = 0;
+        // $i = 0;
+
+        foreach ($order->get_items() as $kitem => $item) {
+            $itemQty = $item->get_quantity();
+            if (!$itemQty) {
+                continue;
+            }
+
+            // $product        = $item->get_product();
+            // $weightVal = 0;
+            // $lengthVal = 0;
+            // $widthVal  = 0;
+            // $heightVal = 0;
+
+            $itemWeight = is_numeric($item->get_product()->get_weight() ) ? $item->get_product()->get_weight() : 0;
+            if ($itemWeight) {
+                // $weightVal = wc_get_weight($itemWeight * $itemQty, 'kg');
+                array_push( $weight, $itemWeight * $itemQty );
+            }
+
+            $itemWidth = is_numeric($item->get_product()->get_width() ) ? $item->get_product()->get_width() : 0;
+            if ($itemWidth) {
+                // $widthVal = wc_get_dimension($itemWidth, 'cm');
+                array_push( $width, $itemWidth );
+            }
+
+            $itemHeight = is_numeric($item->get_product()->get_height() ) ? $item->get_product()->get_height() : 0;
+            if ($itemHeight) {
+                // $heightVal = wc_get_dimension($itemHeight, 'cm');
+                array_push( $height, $itemHeight );
+            }
+
+            $itemLength = is_numeric($item->get_product()->get_length() ) ? $item->get_product()->get_length() : 0;
+            if ($itemLength) {
+                // $lengthVal = wc_get_dimension($itemLength, 'cm');
+                array_push( $length, $itemLength );
+            }
+        
+        }
+        
+        $weightVal = 0;
+        $lengthVal = 0;
+        $widthVal  = 0;
+        $heightVal = 0;
+        if (!empty($weight)) {
+            $weightVal      = ceil(wc_get_weight(array_sum( $weight ), 'kg'));
+        }
+
+        if (!empty($length)) {
+            $lengthVal      = ceil(wc_get_dimension( max( $length ), 'cm' ));
+        }
+
+        if (!empty($width)) {
+            $widthVal      = ceil(wc_get_dimension( max( $width ), 'cm' ));
+        }
+
+        if (!empty($height)) {
+            $heightVal      = ceil(wc_get_dimension( max( $height ), 'cm' ));
+        }
+        
+        
+        $body['weight'][0]      = $weightVal;
+        $body['length'][0]      = $lengthVal;
+        $body['width'][0]       = $widthVal;
+        $body['height'][0]      = $heightVal;
+        $body['dimension'][0]   = $lengthVal . ':' . $widthVal . ':' . $heightVal;
+
+        $body['product'][0]     = 'Order #' . trim($order_id);
+        $body['qty'][0]         = 1;
+        $body['price'][0]       = $order->get_total();
+        
+        $body['buyerName']           = trim($buyerName ?? null);
+        $body['buyerPhone']          = trim($buyerPhone ?? null);
+        $body['buyerEmail']          = trim($buyerEmail ?? null);
+        $body['referenceId']         = trim($order_id);
+        $body['returnUrl']           = trim($this->return_url);
+        $body['notifyUrl']           = trim($this->redirect_url.'&id_order='.$order_id.'&param=notify');
+        $body['cancelUrl']           = trim($this->redirect_url.'&id_order='.$order_id.'&param=cancel');
+        $body['expired']             = trim($this->expied_time ?? 24);
+        $body['expiredType']         = 'hours';
+
+
+        $bodyJson     = json_encode($body, JSON_UNESCAPED_SLASHES);
+        $requestBody  = strtolower(hash('sha256', $bodyJson));
+        $secret       = $this->apikey;
+        $va           = $this->ipaymu_va;
+        $stringToSign = 'POST:' . $va . ':' . $requestBody . ':' . $secret;
+        $signature    = hash_hmac('sha256', $stringToSign, $secret);
+
+        $headers = array(
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'va: ' . $va,
+            'signature: ' . $signature,
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $bodyJson);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $err = curl_error($ch);
+        $res = curl_exec($ch);
+        // $health = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if (!empty($err)) {
+            echo 'Invalid request: ' . $err;
+            exit;
+            // return new WP_Error( 'ipaymu_request', 'Invalid request: ' . $err);
+        }
+        if (empty($res)) {
+            // return new WP_Error( 'ipaymu_request', 'Invalid request');
+            echo 'Request Failed: Invalid response';
+            exit;
+        }
+
+        $response = json_decode($res);
+        if (empty($response->Data->Url)) {
+            echo 'Invalid request: ' . $response->Message;
+            exit;
+            
+        }
+        wp_redirect($response->Data->Url);
+    }
+
 }

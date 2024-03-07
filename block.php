@@ -9,7 +9,7 @@ final class Ipaymu_Blocks extends AbstractPaymentMethodType {
 
     public function initialize() {
         $this->settings = get_option( 'woocommerce_ipaymu_settings', [] );
-        $this->gateway = new Ipaymu();
+        $this->gateway = new WC_Gateway_iPaymu();
     }
 
     public function is_active() {
@@ -40,9 +40,9 @@ final class Ipaymu_Blocks extends AbstractPaymentMethodType {
 
     public function get_payment_method_data() {
         return [
-            'title' => 'Pembayaran iPaymu',
-            'description' => 'Payment Gateway Terlengkap & Terbaik',
-            'icon' => plugins_url('/ipaymu_badge.png', __FILE__)
+            'title'       => 'Pembayaran iPaymu',
+            'description' => 'Pembayaran melalui Virtual Account (VA), QRIS, Alfamart Indomaret, Kartu Kredit, Direct Debit, dan COD',
+            'icon'        => plugins_url('/ipaymu_badge.png', __FILE__)
         ];
     }
 
