@@ -2,11 +2,11 @@
 
 /*
   Plugin Name: iPaymu - Payment Gateway
-  Plugin URI: http://ipaymu.com
+  Plugin URI: https://github.com/ipaymu/iPaymu-wp-plugin
   Description: iPaymu Indonesia Online Payment - Plug & Play, Within 30 seconds ready for LOCAL & INTERNASIONAL. Directly Connected 150 Payment Channels Reach more than 95% of consumers which provides the payment methods they use every day
   Version: 2.0.1
   Author: iPaymu Development Team
-  Author URI: http://ipaymu.com
+  Author URI: https://ipaymu.com
   License: MIT
   WC requires at least: 8.0.0
   WC tested up to: 8.6.0
