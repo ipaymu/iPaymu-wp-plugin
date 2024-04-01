@@ -8,7 +8,8 @@ Requires at least: 6.3<br>
 Tested up to: 8.6.1<br>
 Requires PHP: 7.4<br>
 Stable tag: 2.0.0<br>
-License: MIT
+License: GPLv2
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 This is the official extension to receive payments using iPaymu Indonesia Payment Gateway.
 
