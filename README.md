@@ -8,7 +8,7 @@ Requires at least: 6.3<br>
 Tested up to: 8.6.1<br>
 Requires PHP: 7.4<br>
 Stable tag: 2.0.0<br>
-License: GPLv2
+License: GPL v2 or later<br>
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 This is the official extension to receive payments using iPaymu Indonesia Payment Gateway.
@@ -46,4 +46,23 @@ For help setting up and configuring, please refer to our [user guide](https://ip
 #### Where can I get support or talk to other users?
 
 If you get stuck, you can contact us via email to email to [support@ipaymu.com](mailto:support@ipaymu.com).
+## License
+
+iPaymu&nbsp; Wordpress Payment Gateway Plugin is licensed under the GPL v3 or later.
+
+> This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, version 2, as published by the Free Software Foundation.
+
+> This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+> You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+A copy of the license is included in the root of the plugin’s directory. The file is named `LICENSE`.
+
+## Important Notes
+
+### Licensing
+
+iPaymu&nbsp; Wordpress Payment Gateway Plugin is licensed under the GPL v2 or later; however, if you opt to use third-party code that is not compatible with v2, then you may need to switch to using code that is GPL v3 compatible.
+
+For reference, [here's a discussion](http://make.wordpress.org/themes/2013/03/04/licensing-note-apache-and-gpl/) that covers the Apache 2.0 License used by [Bootstrap](http://twitter.github.io/bootstrap/).
 
