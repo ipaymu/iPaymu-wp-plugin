@@ -1,6 +1,6 @@
 <p align="center"><img width="100" src="https://sandbox.ipaymu.com/asset/images/logo-ipaymu/ipaymu-text-plus-blue.png"></p>
 
-iPaymu&nbsp; WooCommerce - Wordpress Payment Gateway Plugin
+iPaymu&nbsp; Wordpress Payment Gateway Plugin
 
 Contributors: iPaymu Development Team<br>
 Tags: iPaymu, payment gateway, payment processor, payment gateway indonesia, pembayaran virtual account, pembayaran qris, pembayaran indomaret, pembayaran alfamart, pembayaran kartu kredit.<br>
@@ -10,7 +10,7 @@ Requires PHP: 7.4<br>
 Stable tag: 2.0.0<br>
 License: MIT
 
-This is the official WooCommerce extension to receive payments using iPaymu Indonesia Payment Gateway.
+This is the official extension to receive payments using iPaymu Indonesia Payment Gateway.
 
 ### Description
 
