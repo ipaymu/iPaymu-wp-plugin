@@ -7,7 +7,8 @@
   Version: 2.0.1
   Author: iPaymu Development Team
   Author URI: https://ipaymu.com
-  License: MIT
+  License: GPLv2
+  License URI: https://www.gnu.org/licenses/gpl-2.0.html
   WC requires at least: 8.0.0
   WC tested up to: 8.6.0
 */
