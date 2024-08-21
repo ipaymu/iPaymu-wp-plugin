@@ -15,6 +15,7 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
     public $url;
     public $va;
     public $secret;
+    public $completed_payment;
 
 
     // Constructor method
@@ -60,6 +61,13 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
             $this->secret = $this->get_option('production_key');
         }
 
+        if ($this->get_option( 'completed_payment' ) == 'yes') {
+            $this->completed_payment = 'yes';
+            
+        } else {
+            $this->completed_payment = 'no';
+        }
+
         // Actions
         add_action('woocommerce_receipt_ipaymu', array(&$this, 'receipt_page'));
 
@@ -100,6 +108,13 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
                 'type'        => 'checkbox',
                 'description' => '<small>Mode Sandbox/Development digunakan untuk testing transaksi, jika mengaktifkan mode sandbox Anda harus memasukan API Key Sandbox (<a href="https://sandbox.ipaymu.com/integration" target="_blank">dapatkan API Key Sandbox</a>)</small>',
                 'default'     => 'yes',
+            ),
+            'completed_payment' => array(
+                'title'   => __('Status completed after payment', 'woothemes'),
+                'label'       => 'Status ',
+                'type'        => 'checkbox',
+                'description' => '<small>Jika diaktifkan status order menjadi selesai setelah customer melakukan pembayaran. (Default: Processing)</small>',
+                'default'     => 'no',
             ),
             'sandbox_va' => array(
                 'title'       => 'VA Sandbox',
@@ -245,6 +260,10 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
             $body['buyerEmail']          = null;
         }
 
+        $notifyUrl = trim($this->redirect_url . '&id_order=' . $order_id . '&param=notify&order_status=on-hold');
+        if (!empty($this->completed_payment) && $this->completed_payment == 'yes') {
+            $notifyUrl = trim($this->redirect_url . '&id_order=' . $order_id . '&param=notify&order_status=completed');
+        }
         $body['referenceId']         = trim(strval($order_id));
         $body['returnUrl']           = trim($this->return_url);
         $body['notifyUrl']           = trim($this->redirect_url . '&id_order=' . $order_id . '&param=notify');
@@ -316,8 +335,12 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($_REQUEST['status'] == 'berhasil') {
                 $order->add_order_note(__('Payment Success iPaymu ID ' . $_REQUEST['trx_id'], 'woocommerce'));
-                $order->update_status('completed');
-                $order->update_status('processing');
+                
+                if ($_REQUEST['order_status'] == 'completed') {
+                    $order->update_status('completed');
+                } else {
+                    $order->update_status('processing');
+                }
                 $order->payment_complete();
                 echo 'completed';
                 exit;
