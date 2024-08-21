@@ -346,7 +346,8 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
                 exit;
             } else if ($_REQUEST['status'] == 'pending') {
                 $order->add_order_note(__('Waiting Payment iPaymu ID ' . $_REQUEST['trx_id'], 'woocommerce'));
-                $order->update_status('on-hold');
+                // $order->update_status('on-hold');
+                $order->update_status('pending');
                 echo 'on-hold';
                 exit;
             } else if ($_REQUEST['status'] == 'expired') {
