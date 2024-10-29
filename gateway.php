@@ -110,8 +110,8 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
                 'default'     => 'yes',
             ),
             'completed_payment' => array(
-                'title'   => __('Status completed after payment', 'woothemes'),
-                'label'       => 'Status ',
+                'title'   => __('Status Completed After Payment', 'woothemes'),
+                'label'       => 'Status Completed After Payment',
                 'type'        => 'checkbox',
                 'description' => '<small>Jika diaktifkan status order menjadi selesai setelah customer melakukan pembayaran. (Default: Processing)</small>',
                 'default'     => 'no',
