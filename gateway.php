@@ -345,15 +345,25 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
                 echo 'completed';
                 exit;
             } else if ($_REQUEST['status'] == 'pending') {
-                $order->add_order_note(__('Waiting Payment iPaymu ID ' . $_REQUEST['trx_id'], 'woocommerce'));
-                // $order->update_status('on-hold');
-                $order->update_status('pending');
-                echo 'on-hold';
+                if ($order->get_status() == 'pending') { 
+                    $order->add_order_note(__('Waiting Payment iPaymu ID ' . $_REQUEST['trx_id'], 'woocommerce'));
+                    // $order->update_status('on-hold');
+                    $order->update_status('pending');
+                    echo 'on-hold';
+                } else {
+                     echo 'order is ' . $order->get_status();   
+                }
+                
                 exit;
             } else if ($_REQUEST['status'] == 'expired') {
-                $order->add_order_note(__('Payment Expired iPaymu ID ' . $_REQUEST['trx_id'] . ' expired', 'woocommerce'));
-                $order->update_status('cancelled');
-                echo 'cancelled';
+                if ($order->get_status() == 'pending') {
+                    $order->add_order_note(__('Payment Expired iPaymu ID ' . $_REQUEST['trx_id'] . ' expired', 'woocommerce'));
+                    $order->update_status('cancelled');
+                    echo 'cancelled';
+                } else {
+                    echo 'order is ' . $order->get_status();
+                }
+                
                 exit;
             } else {
                 echo 'invalid status';
