@@ -322,21 +322,21 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
         );
     }
 
-
     function check_ipaymu_response()
     {
-        $order = new WC_Order($_REQUEST['id_order']);
+        $entityBody = json_decode(file_get_contents('php://input'),true);
+        $order = new WC_Order($entityBody['id_order']);
 
-        $order_received_url = wc_get_endpoint_url('order-received', $_REQUEST['id_order'], wc_get_page_permalink('checkout'));
+        $order_received_url = wc_get_endpoint_url('order-received', $entityBody['id_order'], wc_get_page_permalink('checkout'));
 
         if ('yes' === get_option('woocommerce_force_ssl_checkout') || is_ssl()) {
             $order_received_url = str_replace('http:', 'https:', $order_received_url);
         }
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if ($_REQUEST['status'] == 'berhasil') {
-                $order->add_order_note(__('Payment Success iPaymu ID ' . $_REQUEST['trx_id'], 'woocommerce'));
+            if ($entityBody['status'] == 'berhasil') {
+                $order->add_order_note(__('Payment Success iPaymu ID ' . $entityBody['trx_id'], 'woocommerce'));
                 
-                if ($_REQUEST['order_status'] == 'completed') {
+                if ($entityBody['order_status'] == 'completed') {
                     $order->update_status('completed');
                 } else {
                     $order->update_status('processing');
@@ -344,26 +344,15 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
                 $order->payment_complete();
                 echo 'completed';
                 exit;
-            } else if ($_REQUEST['status'] == 'pending') {
-                if ($order->get_status() == 'pending') { 
-                    $order->add_order_note(__('Waiting Payment iPaymu ID ' . $_REQUEST['trx_id'], 'woocommerce'));
-                    // $order->update_status('on-hold');
-                    $order->update_status('pending');
-                    echo 'on-hold';
-                } else {
-                     echo 'order is ' . $order->get_status();   
-                }
-                
+            } else if ($entityBody['status'] == 'pending') {
+                $order->add_order_note(__('Waiting Payment iPaymu ID ' . $entityBody['trx_id'], 'woocommerce'));
+                $order->update_status('on-hold');
+                echo 'on-hold';
                 exit;
-            } else if ($_REQUEST['status'] == 'expired') {
-                if ($order->get_status() == 'pending') {
-                    $order->add_order_note(__('Payment Expired iPaymu ID ' . $_REQUEST['trx_id'] . ' expired', 'woocommerce'));
-                    $order->update_status('cancelled');
-                    echo 'cancelled';
-                } else {
-                    echo 'order is ' . $order->get_status();
-                }
-                
+            } else if ($entityBody['status'] == 'expired') {
+                $order->add_order_note(__('Payment Expired iPaymu ID ' . $entityBody['trx_id'] . ' expired', 'woocommerce'));
+                $order->update_status('cancelled');
+                echo 'cancelled';
                 exit;
             } else {
                 echo 'invalid status';
