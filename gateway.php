@@ -266,7 +266,7 @@ class WC_Gateway_iPaymu extends \WC_Payment_Gateway
         }
         $body['referenceId']         = trim(strval($order_id));
         $body['returnUrl']           = trim($this->return_url);
-        $body['notifyUrl']           = trim($this->redirect_url . '&id_order=' . $order_id . '&param=notify');
+        $body['notifyUrl']           = trim($notifyUrl);
         $body['cancelUrl']           = trim($this->redirect_url . '&id_order=' . $order_id . '&param=cancel');
         $body['expired']             = $this->expied_time ?? 24;
         $body['expiredType']         = 'hours';
